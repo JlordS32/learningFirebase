@@ -1,67 +1,83 @@
-import React, { useState } from 'react';
-import { app } from '../firebaseConfig.js';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
+import { app, database } from '../firebaseConfig.js';
 import {
-	getAuth,
-	createUserWithEmailAndPassword,
-	signInWithEmailAndPassword,
-	GoogleAuthProvider,
-	signInWithPopup,
-} from 'firebase/auth';
+	collection,
+	addDoc,
+	getDocs,
+	updateDoc,
+	doc,
+} from 'firebase/firestore';
 
 const App = () => {
-	const auth = getAuth();
-	const googleProvider = new GoogleAuthProvider();
-	const [data, setData] = useState({});
+	const [input, setInput] = useState({});
+	const [data, setData] = useState([]);
+	const collectionRef = collection(database, 'users');
 
 	const handleChange = (e) => {
 		let newInput = {
 			[e.target.name]: e.target.value,
 		};
 
-		setData({
-			...data,
+		setInput({
+			...input,
 			...newInput,
 		});
 	};
 
-	const handleSignUp = () => {
-		createUserWithEmailAndPassword(auth, data.email, data.password)
-			.then((res) => {
-				const user = res.user;
-
-				console.log(user);
+	const handleSubmit = () => {
+		addDoc(collectionRef, {
+			email: input.email,
+			password: input.password,
+		})
+			.then(() => {
+				console.log('Data Added!');
 			})
 			.catch((error) => {
-				alert(error.message);
+				console.error(error.message);
+			});
+
+		getData();
+	};
+
+	const updateData = async (id, newValue) => {
+		const docToUpdate = doc(database, 'users', id);
+
+		updateDoc(docToUpdate, {
+			email: newValue.email,
+		})
+			.then(() => {
+				console.log('Data Updated!');
+				getData();
+			})
+			.catch((error) => {
+				console.error(error.message);
 			});
 	};
 
-	const handleSignIn = () => {
-		signInWithEmailAndPassword(auth, data.email, data.password)
-			.then((res) => {
-				console.log('signed in');
+	const getData = async () => {
+		try {
+			const querySnapshot = await getDocs(collectionRef);
 
-				console.log(user);
-			})
-			.catch((error) => {
-				alert(error.message);
+			const fetchedData = querySnapshot.docs.map((doc) => {
+				return {
+					id: doc.id,
+					...doc.data(),
+				};
 			});
+
+			setData(fetchedData);
+		} catch (error) {
+			console.error('Error fetching data: ', error);
+		}
 	};
 
-	const handleSignInPopup = () => {
-		signInWithPopup(auth, googleProvider)
-			.then((res) => {
-				console.log(res.user);
-			})
-			.catch((error) => {
-				console.log(error.message);
-			});
-	};
+	useLayoutEffect(() => {
+		getData();
+	}, []);
 
 	return (
 		<div className='app-container'>
 			<div>
-				<h1>Sign up</h1>
 				<input
 					type='email'
 					name='email'
@@ -74,26 +90,61 @@ const App = () => {
 					placeholder='Password'
 					onChange={handleChange}
 				/>
-				<button onClick={handleSignUp}>Submit</button>
+				<button onClick={handleSubmit}>Submit</button>
 			</div>
-			<div>
-				<h1>Sign in</h1>
-				<input
-					type='email'
-					name='email'
-					placeholder='Email'
-					onChange={handleChange}
-				/>
-				<input
-					type='Password'
-					name='password'
-					placeholder='Password'
-					onChange={handleChange}
-				/>
-				<button onClick={handleSignIn}>Submit</button>
-			</div>
-			<div>
-				<button onClick={handleSignInPopup}>Sign in with google</button>
+
+			<div
+				style={{
+					display: 'flex',
+					gap: '10px',
+					width: '100%',
+					flexWrap: 'wrap',
+				}}
+			>
+				{data.map((item) => {
+					return (
+						<div
+							className='item'
+							style={{
+								border: '1px solid black',
+								width: '200px',
+								textAlign: 'center',
+							}}
+							key={item.id}
+						>
+							<p>{item.email}</p>
+							<p>{item.password}</p>
+							<input
+								type='email'
+								name='email'
+								placeholder='New Value'
+								onChange={handleChange}
+							/>
+							<div
+								style={{
+									display: 'flex',
+									justifyContent: 'space-around',
+									padding: '10px',
+								}}
+							>
+								<button onClick={() => updateData(item.id, input)}>
+									Update
+								</button>
+								<button
+									onClick={() => deleteData(item.id)}
+									style={{
+										backgroundColor: 'red',
+										color: 'white',
+										border: '0',
+                              borderRadius: '3px'
+									}}
+								>
+									Delete
+								</button>
+							</div>
+						</div>
+					);
+				})}
 			</div>
 		</div>
 	);
