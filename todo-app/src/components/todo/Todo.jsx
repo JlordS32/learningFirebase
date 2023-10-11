@@ -11,6 +11,7 @@ import {
 	updateDoc,
 	deleteDoc,
 	doc,
+	Timestamp,
 } from 'firebase/firestore';
 
 const Todo = () => {
@@ -31,30 +32,35 @@ const Todo = () => {
 	};
 
 	const handleSubmit = () => {
-		setTodo((prevTodo) => {
-			if (
-				prevTodo.title === input.title &&
-				prevTodo.content === input.content
-			) {
-				console.log('data is the same');
-				return prevTodo; // Return the previous state without updating
-			}
+		setTodo(input);
+		const currentTime = Timestamp.now();
 
-			return {
-				title: input.title ? input.title : '',
-				content: input.content ? input.content : '',
-			};
-		});
-
-		console.log(input.title, input.content);
-
-		addTodoData(input.title, input.content);
+		if (input.title || input.content) {
+			addTodoData(input.title, input.content, currentTime);
+		}
 	};
 
-	const addTodoData = (title, content) => {
+	const deleteTodo = (id) => {
+		const docToUpdate = doc(database, 'todo', id);
+
+		deleteDoc(docToUpdate)
+			.then(() => {
+				console.log('Data has been delete!');
+			})
+			.catch((error) => {
+				console.error(error.message);
+			});
+
+		getTodoData();
+	};
+
+	const addTodoData = (title = '', content = '', currentTime) => {
+		console.log(title);
+
 		addDoc(collectionRef, {
 			title: title,
 			content: content,
+			createdAtTimeStamp: currentTime,
 		})
 			.then(() => {
 				console.log('Data Added!');
@@ -65,6 +71,8 @@ const Todo = () => {
 
 		getTodoData();
 	};
+
+	// ...
 
 	const getTodoData = async () => {
 		try {
@@ -77,15 +85,16 @@ const Todo = () => {
 				};
 			});
 
+			// Sort the fetchedData array by timestamp in ascending order
+			fetchedData.sort((a, b) => a.createdAtTimeStamp - b.createdAtTimeStamp);
+
 			setTodoData(fetchedData);
 		} catch (error) {
 			console.error('Error fetching data: ', error.message);
 		}
 	};
 
-	useLayoutEffect(() => {
-		getTodoData();
-	});
+	// ...
 
 	useEffect(() => {
 		getTodoData();
@@ -101,10 +110,7 @@ const Todo = () => {
 					width: 'clamp(500px, 90%, 720px)',
 				}}
 			>
-				<Form.Group
-					className='mb-3'
-					controlId='exampleForm.ControlTextarea1'
-				>
+				<Form.Group className='mb-3'>
 					<Form.Control
 						as='input'
 						rows={3}
@@ -134,7 +140,10 @@ const Todo = () => {
 				</Button>
 			</Form>
 
-			{/* <Todos /> */}
+			<Todos
+				todos={todoData}
+				deleteTodo={deleteTodo}
+			/>
 		</div>
 	);
 };

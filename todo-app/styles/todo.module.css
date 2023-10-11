@@ -1,0 +1,7 @@
+.todo {
+   transition: 200ms ease-in;
+}
+
+.todo:hover {
+   transform: scale(1.01);
+}
