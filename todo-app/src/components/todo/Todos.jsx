@@ -18,6 +18,10 @@ const Todos = ({ todos, deleteTodo }) => {
 		setSelectedTodoId(todoId);
 	};
 
+	const handleUpdate = () => {
+		console.log
+	}
+
 	const handleOnChange = (e) => {
 		console.log(e.target.value);
 	};
