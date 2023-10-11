@@ -1,7 +1,17 @@
 .todo {
    transition: 200ms ease-in;
+   background-color: white;
 }
 
 .todo:hover {
-   transform: scale(1.01);
+   background-color: rgb(31, 30, 30);
+   color: white;
+}
+
+.todo button {
+   transition: 150ms ease;
+}
+
+.todo button:hover {
+   transform: scale(1.025);
 }

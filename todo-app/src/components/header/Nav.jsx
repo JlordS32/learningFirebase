@@ -8,7 +8,7 @@ const Navigation = () => {
 	return (
 		<Navbar expand="lg" className="bg-dark">
       <Container>
-        <Navbar.Brand href="#home" className='text-white'>React-Bootstrap</Navbar.Brand>
+        <Navbar.Brand href="#home" className='text-white'>Let's make some todo</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
       </Container>
     </Navbar>

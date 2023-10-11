@@ -107,7 +107,7 @@ const Todo = () => {
 			<Form
 				className='px-3 py-3'
 				style={{
-					width: 'clamp(500px, 90%, 720px)',
+					width: 'clamp(300px, 90%, 720px)',
 				}}
 			>
 				<Form.Group className='mb-3'>
