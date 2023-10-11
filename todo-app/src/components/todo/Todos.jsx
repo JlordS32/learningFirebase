@@ -8,27 +8,38 @@ import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 
-const Todos = ({ todos, deleteTodo }) => {
+const Todos = ({ todos, deleteTodo, updateTodo }) => {
 	const parent = useRef(null);
 	const [isEditable, setIsEditable] = useState(false);
 	const [selectedTodoId, setSelectedTodoId] = useState(null);
+	const [input, setInput] = useState([]);
+	const [updatedTodo, setUpdatedTodo] = useState([]);
 
 	const handleIsEdit = (todoId) => {
 		setIsEditable(!isEditable);
 		setSelectedTodoId(todoId);
 	};
 
-	const handleUpdate = () => {
-		console.log
+	const handleUpdate = (todoId) => {
+		setIsEditable(!isEditable);
+		setSelectedTodoId(todoId);
 	}
 
 	const handleOnChange = (e) => {
-		console.log(e.target.value);
+		let newInput = {
+			[e.target.name]: e.target.value,
+		};
+
+		setInput({
+			...input,
+			...newInput,
+		});
 	};
 
 	useEffect(() => {
 		parent.current && autoAnimate(parent.current);
 	}, [parent]);
+
 
 	return (
 		<div
@@ -69,7 +80,7 @@ const Todos = ({ todos, deleteTodo }) => {
 									/>
 								</Form>
 								<div>
-									<Button onClick={() => handleIsEdit(item.id)}>Update</Button>
+									<Button onClick={() => handleUpdate(item.id)}>Update</Button>
 								</div>
 							</Card.Body>
 						) : (

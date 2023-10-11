@@ -54,6 +54,23 @@ const Todo = () => {
 		getTodoData();
 	};
 
+	const updateTodo = (id, title, content) => {
+		const docToUpdate = doc(database, 'todo', id);
+
+		updateDoc(docToUpdate, {
+			title: title,
+			content: content,
+		})
+			.then(() => {
+				console.log('Data has been delete!');
+			})
+			.catch((error) => {
+				console.error(error.message);
+			});
+
+		getTodoData();
+	};
+
 	const addTodoData = (title = '', content = '', currentTime) => {
 		console.log(title);
 
@@ -143,6 +160,7 @@ const Todo = () => {
 			<Todos
 				todos={todoData}
 				deleteTodo={deleteTodo}
+				updateTodo={updateTodo}
 			/>
 		</div>
 	);
