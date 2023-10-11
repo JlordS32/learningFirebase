@@ -1,12 +1,13 @@
 import React from 'react';
+import Navigation from './header/Nav';
 import 'bootstrap/dist/css/bootstrap.css';
-import { Button } from 'bootstrap';
+import Todo from './todo/Todo';
 
 const App = () => {
 	return (
-		<div className='container'>
-			<Button variant='primary'>Hello</Button>
-         <h1>Hello</h1>
+		<div className='app '>
+         <Navigation />
+         <Todo />
 		</div>
 	);
 };
