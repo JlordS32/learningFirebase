@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState, useRef } from 'react';
 import Todos from './Todos';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
@@ -19,6 +19,9 @@ const Todo = () => {
 	const [todo, setTodo] = useState([]);
 	const [todoData, setTodoData] = useState([]);
 
+	const titleInputRef = useRef();
+	const contentInputRef = useRef();
+ 
 	const collectionRef = collection(database, 'todo');
 	const handleChange = (e) => {
 		let newInput = {
@@ -38,6 +41,14 @@ const Todo = () => {
 		if (input.title || input.content) {
 			addTodoData(input.title, input.content, currentTime);
 		}
+
+		contentInputRef.current.value = '';
+		titleInputRef.current.value = '';
+
+		setInput({
+			title: '',
+			content: '',
+		});
 	};
 
 	const deleteTodo = (id) => {
@@ -62,7 +73,7 @@ const Todo = () => {
 			content: content,
 		})
 			.then(() => {
-				console.log('Data has been delete!');
+				console.log('Data has been updated!');
 			})
 			.catch((error) => {
 				console.error(error.message);
@@ -115,7 +126,6 @@ const Todo = () => {
 
 	useEffect(() => {
 		getTodoData();
-		console.log(todoData);
 	}, [todo]);
 
 	return (
@@ -136,6 +146,7 @@ const Todo = () => {
 						className='mb-3'
 						name='title'
 						onChange={handleChange}
+						ref={titleInputRef}
 					/>
 					<Form.Control
 						as='textarea'
@@ -146,6 +157,7 @@ const Todo = () => {
 							resize: 'none',
 						}}
 						onChange={handleChange}
+						ref={contentInputRef}
 					/>
 				</Form.Group>
 

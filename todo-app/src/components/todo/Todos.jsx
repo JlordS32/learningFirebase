@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
-import styles from '../../../styles/todo.module.css';
+import styles from '../../styles/todo.module.css';
 import autoAnimate from '@formkit/auto-animate';
 
 // BOotstrap components
@@ -13,17 +13,31 @@ const Todos = ({ todos, deleteTodo, updateTodo }) => {
 	const [isEditable, setIsEditable] = useState(false);
 	const [selectedTodoId, setSelectedTodoId] = useState(null);
 	const [input, setInput] = useState([]);
-	const [updatedTodo, setUpdatedTodo] = useState([]);
+	const [updatedTodo, setUpdatedTodo] = useState({
+		id: '',
+		title: '',
+		content: '',
+	});
 
 	const handleIsEdit = (todoId) => {
 		setIsEditable(!isEditable);
 		setSelectedTodoId(todoId);
 	};
 
-	const handleUpdate = (todoId) => {
+	const handleUpdate = (todoId, prevTitle, prevContent) => {
 		setIsEditable(!isEditable);
 		setSelectedTodoId(todoId);
-	}
+
+		if (Object.entries(input).length > 0) {
+			setUpdatedTodo({
+				id: todoId,
+				title: input.title ? input.title : prevTitle,
+				content: input.content ? input.content : prevContent,
+			});
+		}
+
+		setInput([]);
+	};
 
 	const handleOnChange = (e) => {
 		let newInput = {
@@ -40,6 +54,14 @@ const Todos = ({ todos, deleteTodo, updateTodo }) => {
 		parent.current && autoAnimate(parent.current);
 	}, [parent]);
 
+	useEffect(() => {
+		const { id, title, content } = updatedTodo;
+
+		if (id !== '' && title !== '' && content !== '') {
+			updateTodo(id, title, content);
+		}
+
+	}, [updatedTodo]);
 
 	return (
 		<div
@@ -57,12 +79,12 @@ const Todos = ({ todos, deleteTodo, updateTodo }) => {
 						className={`${styles['todo']} shadow-sm rounded`}
 					>
 						{item.id === selectedTodoId && isEditable ? (
-							<Card.Body>
-								<Form>
+							<Card.Body className={styles['update-input']}>
+								<Form >
 									<Form.Control
 										as='input'
 										placeholder='Update title...'
-										defaultValue={''}
+										defaultValue={item.title}
 										className='mb-3'
 										name='title'
 										onChange={handleOnChange}
@@ -70,7 +92,7 @@ const Todos = ({ todos, deleteTodo, updateTodo }) => {
 									<Form.Control
 										as='textarea'
 										placeholder='Update content...'
-										defaultValue={''}
+										defaultValue={item.content}
 										className='mb-3'
 										name='content'
 										style={{
@@ -80,26 +102,43 @@ const Todos = ({ todos, deleteTodo, updateTodo }) => {
 									/>
 								</Form>
 								<div>
-									<Button onClick={() => handleUpdate(item.id)}>Update</Button>
-								</div>
-							</Card.Body>
-						) : (
-							<Card.Body>
-								<Card.Title>{item.title}</Card.Title>
-								<Card.Text>{item.content}</Card.Text>
-								<div
-									className='d-flex justify-content-center'
-									style={{ gap: '1rem' }}
-								>
-									<Button onClick={() => handleIsEdit(item.id)}>Update</Button>
 									<Button
-										className='bg-danger border-danger'
-										onClick={() => deleteTodo(item.id)}
+										onClick={() =>
+											handleUpdate(item.id, item.title, item.content)
+										}
 									>
-										Delete
+										Update
 									</Button>
 								</div>
 							</Card.Body>
+						) : (
+							<>
+								<Card.Body>
+									<Card.Title>{item.title}</Card.Title>
+									<Card.Text>{item.content}</Card.Text>
+								</Card.Body>
+								<Card.Footer
+									style={{
+										backgroundColor: 'transparent',
+										border: '0',
+									}}
+								>
+									<div
+										className='d-flex justify-content-center'
+										style={{ gap: '1rem' }}
+									>
+										<Button onClick={() => handleIsEdit(item.id)}>
+											Update
+										</Button>
+										<Button
+											className='bg-danger border-danger'
+											onClick={() => deleteTodo(item.id)}
+										>
+											Delete
+										</Button>
+									</div>
+								</Card.Footer>
+							</>
 						)}
 					</Card>
 				);

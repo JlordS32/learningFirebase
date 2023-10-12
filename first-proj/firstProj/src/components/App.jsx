@@ -6,6 +6,7 @@ import {
 	getDocs,
 	updateDoc,
 	doc,
+   deleteDoc,
 } from 'firebase/firestore';
 
 const App = () => {
@@ -45,13 +46,25 @@ const App = () => {
 		updateDoc(docToUpdate, {
 			email: newValue.email,
 		})
-			.then(() => {
-				console.log('Data Updated!');
-				getData();
-			})
-			.catch((error) => {
-				console.error(error.message);
-			});
+      .then(() => {
+         console.log('Data Updated!');
+         getData();
+      })
+      .catch((error) => {
+         console.error(error.message);
+      });
+	};
+	const deleteData = async (id) => {
+		const docToUpdate = doc(database, 'users', id);
+
+		deleteDoc(docToUpdate)
+      .then(() => {
+         console.log('Data Deleted!');
+         getData();
+      })
+      .catch((error) => {
+         console.error(error.message);
+      });
 	};
 
 	const getData = async () => {
