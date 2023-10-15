@@ -23,6 +23,15 @@ const App = () => {
 
 	const collectionRef = collection(database, 'users');
 
+	// const searchOutput = searchQuery
+	// 	? query(collectionRef, where('name', '==', 'test'))
+	// 	: collectionRef;
+
+	const nameQuery = query(
+		collectionRef,
+		where('email', '==', 'test')
+	);
+
 	const handleChange = (e) => {
 		let newInput = {
 			[e.target.name]: e.target.value,
@@ -79,7 +88,7 @@ const App = () => {
 	};
 
 	const getData = async () => {
-		onSnapshot(collectionRef, (data) => {
+		onSnapshot(nameQuery, (data) => {
 			try {
 				const fetchedData = data.docs.map((doc) => {
 					return {
@@ -100,7 +109,7 @@ const App = () => {
 	}, []);
 
 	useEffect(() => {
-		console.log(searchQuery);
+		console.log(searchQuery ? `input: ${searchQuery}` : 'no input');
 	}, [searchQuery]);
 
 	return (
@@ -111,7 +120,7 @@ const App = () => {
 					style={{
 						paddingBottom: '30px',
 					}}
-               onChange={handleSearchInput}
+					onChange={handleSearchInput}
 				>
 					<input
 						type='text'
