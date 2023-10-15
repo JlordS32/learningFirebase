@@ -1,4 +1,9 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, {
+	cloneElement,
+	useEffect,
+	useLayoutEffect,
+	useState,
+} from 'react';
 import { app, database } from '../firebaseConfig.js';
 import {
 	collection,
@@ -6,7 +11,8 @@ import {
 	getDocs,
 	updateDoc,
 	doc,
-   deleteDoc,
+	deleteDoc,
+	onSnapshot,
 } from 'firebase/firestore';
 
 const App = () => {
@@ -36,8 +42,6 @@ const App = () => {
 			.catch((error) => {
 				console.error(error.message);
 			});
-
-		getData();
 	};
 
 	const updateData = async (id, newValue) => {
@@ -46,47 +50,45 @@ const App = () => {
 		updateDoc(docToUpdate, {
 			email: newValue.email,
 		})
-      .then(() => {
-         console.log('Data Updated!');
-         getData();
-      })
-      .catch((error) => {
-         console.error(error.message);
-      });
+			.then(() => {
+				console.log('Data Updated!');
+			})
+			.catch((error) => {
+				console.error(error.message);
+			});
 	};
 	const deleteData = async (id) => {
 		const docToUpdate = doc(database, 'users', id);
 
 		deleteDoc(docToUpdate)
-      .then(() => {
-         console.log('Data Deleted!');
-         getData();
-      })
-      .catch((error) => {
-         console.error(error.message);
-      });
+			.then(() => {
+				console.log('Data Deleted!');
+			})
+			.catch((error) => {
+				console.error(error.message);
+			});
 	};
 
 	const getData = async () => {
-		try {
-			const querySnapshot = await getDocs(collectionRef);
+		onSnapshot(collectionRef, (data) => {
+			try {
+				const fetchedData = data.docs.map((doc) => {
+					return {
+						id: doc.id,
+						...doc.data(),
+					};
+				});
 
-			const fetchedData = querySnapshot.docs.map((doc) => {
-				return {
-					id: doc.id,
-					...doc.data(),
-				};
-			});
-
-			setData(fetchedData);
-		} catch (error) {
-			console.error('Error fetching data: ', error);
-		}
+				setData(fetchedData);
+			} catch (error) {
+				console.error('Error fetching data: ', error).message;
+			}
+		});
 	};
 
-	useLayoutEffect(() => {
+	useEffect(() => {
 		getData();
-	}, []);
+	}, [])
 
 	return (
 		<div className='app-container'>
@@ -149,7 +151,7 @@ const App = () => {
 										backgroundColor: 'red',
 										color: 'white',
 										border: '0',
-                              borderRadius: '3px'
+										borderRadius: '3px',
 									}}
 								>
 									Delete
