@@ -26,3 +26,17 @@ body {
 	padding-top: 2rem;
 	justify-content: center;
 }
+
+.app-container > div:last-child .item {
+	padding: 0.4rem 1rem;
+	border-radius: 5px;
+}
+
+button {
+	padding: 0.2rem 0.5rem;
+}
+
+input {
+	padding: 0.2rem 1rem;
+	margin: 0 0.2rem;
+}
