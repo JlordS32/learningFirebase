@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './components/FireStoreQueries.jsx';
+import App from './components/FirebaseAuthState.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
 	<React.StrictMode>
