@@ -15,10 +15,19 @@ import {
 	onSnapshot,
 } from 'firebase/firestore';
 
+import {
+	getAuth,
+	signInWithEmailAndPassword,
+	onAuthStateChanged,
+	signOut,
+} from 'firebase/auth';
+
 const App = () => {
 	const [input, setInput] = useState({});
 	const [data, setData] = useState([]);
+	const [signedUser, setSignedUser] = useState([]);
 	const collectionRef = collection(database, 'users');
+	const auth = getAuth();
 
 	const handleChange = (e) => {
 		let newInput = {
@@ -28,6 +37,17 @@ const App = () => {
 		setInput({
 			...input,
 			...newInput,
+		});
+	};
+
+	const handleSignInOut = (e) => {
+		let newUser = {
+			[e.target.name]: e.target.value,
+		};
+
+		setSignedUser({
+			...signedUser,
+			...newUser,
 		});
 	};
 
@@ -42,6 +62,16 @@ const App = () => {
 			.catch((error) => {
 				console.error(error.message);
 			});
+	};
+
+	const handleSignIn = () => {
+		if (signedUser.email.trim() !== '' && signedUser.password.trim() !== '') {
+			signInWithEmailAndPassword(auth, signedUser.email, signedUser.password);
+		}
+	};
+
+	const handleSignOut = () => {
+		signOut(auth);
 	};
 
 	const updateData = async (id, newValue) => {
@@ -90,6 +120,16 @@ const App = () => {
 		getData();
 	}, []);
 
+	useEffect(() => {
+		onAuthStateChanged(auth, (data) => {
+			if (data) {
+				console.log('signed in');
+			} else {
+				console.log('not signed in');
+			}
+		});
+	}, []);
+
 	return (
 		<div className='app-container'>
 			<div
@@ -100,31 +140,38 @@ const App = () => {
 					alignItems: 'center',
 					gap: '10px 0',
 					margin: '20px 0',
-               outline: '1px black solid',
-               padding: '40px'
+					outline: '1px black solid',
+					padding: '40px',
 				}}
 			>
-            <h1>Sign in</h1>
+				<h1>Sign in</h1>
 				<div>
 					<input
 						type='email'
 						placeholder='Enter email here'
+						onChange={handleSignInOut}
+						name='email'
 					/>
 					<input
 						type='password'
 						placeholder='Enter email here'
+						onChange={handleSignInOut}
+						name='password'
 					/>
 				</div>
-				<div style={{
-               display: 'flex',
-               width: '100%',
-               justifyContent: 'center',
-               gap: '0 10px'
-            }}>
+				<div
+					style={{
+						display: 'flex',
+						width: '100%',
+						justifyContent: 'center',
+						gap: '0 10px',
+					}}
+				>
 					<button
 						style={{
 							width: '30%',
 						}}
+						onClick={handleSignIn}
 					>
 						Sign in
 					</button>
@@ -132,6 +179,7 @@ const App = () => {
 						style={{
 							width: '30%',
 						}}
+                  onClick={handleSignOut}
 					>
 						Sign out
 					</button>
