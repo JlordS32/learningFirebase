@@ -88,7 +88,7 @@ const App = () => {
 	};
 
 	const getData = async () => {
-		onSnapshot(nameQuery, (data) => {
+		onSnapshot(collectionRef, (data) => {
 			try {
 				const fetchedData = data.docs.map((doc) => {
 					return {
@@ -107,10 +107,6 @@ const App = () => {
 	useEffect(() => {
 		getData();
 	}, []);
-
-	useEffect(() => {
-		console.log(searchQuery ? `input: ${searchQuery}` : 'no input');
-	}, [searchQuery]);
 
 	return (
 		<div className='app-container'>
