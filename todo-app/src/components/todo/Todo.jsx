@@ -7,12 +7,13 @@ import { app, database } from '../../firebaseConfig';
 import {
 	collection,
 	addDoc,
-	getDocs,
+	onSnapshot,
 	updateDoc,
 	deleteDoc,
 	doc,
 	Timestamp,
 } from 'firebase/firestore';
+import { toast } from 'react-toastify';
 
 const Todo = () => {
 	const [input, setInput] = useState([]);
@@ -21,7 +22,7 @@ const Todo = () => {
 
 	const titleInputRef = useRef();
 	const contentInputRef = useRef();
- 
+
 	const collectionRef = collection(database, 'todo');
 	const handleChange = (e) => {
 		let newInput = {
@@ -63,6 +64,11 @@ const Todo = () => {
 			});
 
 		getTodoData();
+
+		toast.error('Todo delete!', {
+			position: 'top-center',
+			theme: 'dark'
+		});
 	};
 
 	const updateTodo = (id, title, content) => {
@@ -74,16 +80,23 @@ const Todo = () => {
 		})
 			.then(() => {
 				console.log('Data has been updated!');
+				toast.success('Todo has been updated!', {
+					position: 'top-center',
+					theme: 'dark'
+				});
 			})
 			.catch((error) => {
 				console.error(error.message);
+				toast.error('Todo update failed! :(', {
+					position: 'top-center',
+					theme: 'dark'
+				});
 			});
 
 		getTodoData();
 	};
 
 	const addTodoData = (title = '', content = '', currentTime) => {
-		console.log(title);
 
 		addDoc(collectionRef, {
 			title: title,
@@ -98,28 +111,32 @@ const Todo = () => {
 			});
 
 		getTodoData();
+		toast.success('Todo added!', {
+			position: 'top-center',
+			theme: 'dark'
+		});
 	};
 
 	// ...
 
 	const getTodoData = async () => {
-		try {
-			const querySnapshot = await getDocs(collectionRef);
+		onSnapshot(collectionRef, (data) => {
+			try {
+				const fetchedData = data.docs.map((doc) => {
+					return {
+						id: doc.id,
+						...doc.data(),
+					};
+				});
 
-			const fetchedData = querySnapshot.docs.map((doc) => {
-				return {
-					id: doc.id,
-					...doc.data(),
-				};
-			});
+				// Sort the fetchedData array by timestamp in ascending order
+				fetchedData.sort((a, b) => a.createdAtTimeStamp - b.createdAtTimeStamp);
 
-			// Sort the fetchedData array by timestamp in ascending order
-			fetchedData.sort((a, b) => a.createdAtTimeStamp - b.createdAtTimeStamp);
-
-			setTodoData(fetchedData);
-		} catch (error) {
-			console.error('Error fetching data: ', error.message);
-		}
+				setTodoData(fetchedData);
+			} catch (error) {
+				console.error('Error fetching data: ', error.message);
+			}
+		});
 	};
 
 	// ...
