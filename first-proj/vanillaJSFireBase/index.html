@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0"
+		/>
+		<title>Vanilla Firebase</title>
+	</head>
+	<style>
+		@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200&display=swap');
+
+		:root {
+			font-family: 'Inter', sans-serif;
+		}
+
+		.main {
+			display: flex;
+			height: 100vh;
+			justify-content: center;
+			align-items: center;
+			flex-direction: column;
+			gap: 30px;
+		}
+
+		.sign-in-container {
+			display: flex;
+			gap: 0 20px;
+		}
+
+		.sign-in,
+		.sign-up {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			outline: 1px black solid;
+			padding: 1rem;
+		}
+
+		.todo-component {
+			width: 70%;
+		}
+
+		.todos {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(100px, 0.2fr));
+			grid-auto-rows: 50px;
+			gap: 1rem;
+			padding: 2rem 0;
+		}
+
+		.todos .todo {
+			outline: 1px red solid;
+			width: 20;
+		}
+	</style>
+	<body>
+		<div class="main">
+			<div class="sign-in-container">
+				<div class="sign-in">
+					<h1>Sign in</h1>
+					<div>
+						<label for="email">Email</label>
+						<input
+							placeholder="Email"
+							type="email"
+							name="email"
+							class="email"
+						/>
+					</div>
+					<div>
+						<label for="password">Password</label>
+						<input
+							placeholder="Password"
+							type="password"
+							name="password"
+							class="password"
+						/>
+					</div>
+					<button>Submit</button>
+				</div>
+				<div class="sign-up">
+					<h1>Sign up</h1>
+					<div>
+						<label for="email">Email</label>
+						<input
+							placeholder="Email"
+							type="email"
+							name="email"
+							class="email"
+						/>
+					</div>
+					<div>
+						<label for="password">Password</label>
+						<input
+							placeholder="Password"
+							type="password"
+							name="password"
+							class="password"
+						/>
+					</div>
+					<button>Submit</button>
+				</div>
+			</div>
+
+			<div class="todo-component">
+				<div class="create-new-todo">
+					<input
+						type="text"
+						placeholder="type your new todo here..."
+					/>
+					<button>Submit</button>
+				</div>
+				<div class="todos"></div>
+			</div>
+		</div>
+	</body>
+	<script
+		src="index.js"
+		type="module"
+	></script>
+</html>
