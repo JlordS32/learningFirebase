@@ -1,9 +1,3 @@
-interface TodoType {
-	id: string;
-	title: string;
-	content: string;
-}
-
 export const createLocalData = (key: string, value: Array<Object>): void => {
 	localStorage.setItem(key, JSON.stringify(value));
 };
