@@ -3,8 +3,8 @@ export const createLocalData = (key: string, value: Array<Object>): void => {
 };
 
 export const fetchData = (key: string): Array<Object> | null => {
-   const dataString = localStorage.getItem(key);
-   const data = dataString ? JSON.parse(dataString) : null;
- 
-   return data;
- };
+	const dataString = localStorage.getItem(key);
+	const data = dataString ? JSON.parse(dataString) : null;
+
+	return data;
+};

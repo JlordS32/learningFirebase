@@ -1,5 +1,8 @@
 import { auth, database } from '../firebaseConfig.ts';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import {
+	createUserWithEmailAndPassword,
+	signInWithEmailAndPassword,
+} from 'firebase/auth';
 import { collection, addDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 
@@ -22,7 +25,22 @@ export const signUpUsers = async (email: string, password: string) => {
 			userId: userInfo.uid,
 			email: email,
 		});
-      
+	} catch (error: unknown) {
+		if (error instanceof Error) {
+			console.error(error.message);
+		} else {
+			console.error('An unknown error occurred');
+		}
+	}
+};
+
+export const logInUsers = (email: string, password: string) => {
+	try {
+		toast.promise(signInWithEmailAndPassword(auth, email, password), {
+			pending: 'Signing in...',
+			success: 'User signed in successfully!',
+			error: 'Invalid password! Try again uwu~',
+		});
 	} catch (error: unknown) {
 		if (error instanceof Error) {
 			console.error(error.message);
