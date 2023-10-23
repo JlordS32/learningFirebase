@@ -3,12 +3,20 @@ import {
 	createUserWithEmailAndPassword,
 	signInWithEmailAndPassword,
 	signOut,
+	User,
 } from 'firebase/auth';
-import { collection, addDoc } from 'firebase/firestore';
+import {
+	collection,
+	addDoc,
+	doc,
+	onSnapshot,
+	Timestamp,
+} from 'firebase/firestore';
 import { toast } from 'react-toastify';
 
 interface TodoType {
 	userId: string;
+	id: string;
 	title: string;
 	description: string;
 	createdAt: string;
@@ -70,9 +78,9 @@ export const logInUsers = async (
 	}
 };
 
-export const signOutUser = async () => {
+export const signOutUser = () => {
 	try {
-		await toast.promise(signOut(auth), {
+		return toast.promise(signOut(auth), {
 			pending: 'Signing out...',
 			success: 'User signed out successfully!',
 			error: 'An error occurred while signing out.',
@@ -86,6 +94,55 @@ export const signOutUser = async () => {
 	}
 };
 
-export const addNewTodo = async () => {
+export const addTodoData = (
+	userId: string,
+	id: string,
+	title: string = '',
+	description: string = ''
+) => {
+	const collectionRef = collection(database, 'todos', userId, 'todoOwner');
 
-}
+	return toast.promise(
+		addDoc(collectionRef, {
+			userId: userId,
+			id: id,
+			title: title,
+			description: description,
+			createdAtTimeStamp: Timestamp.now(),
+		}),
+		{
+			pending: 'Adding todo...',
+			success: 'Todo added successfully!',
+			error: 'An error occurred while a	dding your todo please try again!',
+		}
+	);
+};
+
+export const getTodoData = async (currentUser: User) => {
+	const collectionRef = collection(
+		database,
+		'todos',
+		currentUser.uid,
+		'todoOwner'
+	);
+
+	return new Promise((resolve, reject) => {
+		onSnapshot(collectionRef, (data) => {
+			try {
+				const fetchedData = data.docs.map((doc) => {
+					return {
+						...doc.data(),
+					};
+				});
+
+				// Sort the fetchedData array by timestamp in ascending order
+				fetchedData.sort((a, b) => a.createdAtTimeStamp - b.createdAtTimeStamp);
+
+				resolve(fetchedData);
+			} catch (error: unknown) {
+				console.error('Error fetching data: ', error);
+				reject(error);
+			}
+		});
+	});
+};

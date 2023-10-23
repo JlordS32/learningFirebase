@@ -1,9 +1,9 @@
 import React from 'react';
 import Card from 'react-bootstrap/Card';
 
-const Todo: React.FC<{ title: string; content: string; id: string }> = ({
+const Todo: React.FC<{ title: string; description: string; id: string }> = ({
 	title,
-	content,
+	description,
 	id,
 }) => {
 	return (
@@ -16,7 +16,7 @@ const Todo: React.FC<{ title: string; content: string; id: string }> = ({
 					<Card.Title>{title}</Card.Title>
 				</Card.Header>
 				<Card.Body>
-					<Card.Text>{content}</Card.Text>
+					<Card.Text>{description}</Card.Text>
 				</Card.Body>
 			</Card>
 		</div>

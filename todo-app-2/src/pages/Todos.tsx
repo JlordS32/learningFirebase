@@ -6,20 +6,36 @@ import Todo from '../components/Todo';
 // libraries
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 
+// firebase imports
+import { auth } from '../firebaseConfig';
+import { User, onAuthStateChanged } from 'firebase/auth';
+import { addTodoData, getTodoData } from '../utilities/firebaseUtilities';
+
 // react-bootstrap imports
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import { createLocalData, fetchData } from '../utilities/helpers';
+import {
+	createLocalData,
+	deleteLocalData,
+	fetchData,
+} from '../utilities/helpers';
 import { toast } from 'react-toastify';
 
+// interfaces
 interface TodoType {
+	userId: string;
 	id: string;
 	title: string;
-	content: string;
+	description: string;
+	createAtTimeStamp?: string;
 }
 
 const Todos: React.FC = () => {
+	//  useState hooks
 	const [todos, setTodos] = useState<TodoType[]>([]);
+	const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+	// useRef hooks
 	const titleRef = useRef<HTMLInputElement>(null);
 	const contentRef = useRef<HTMLInputElement>(null);
 
@@ -37,18 +53,35 @@ const Todos: React.FC = () => {
 
 	const submitTodo = () => {
 		const newTodo = {
+			userId: currentUser?.uid ?? '',
 			id: crypto.randomUUID(),
 			title: titleRef.current?.value || '',
-			content: contentRef.current?.value || '',
+			description: contentRef.current?.value || '',
 		};
 
 		if (
 			titleRef.current?.value.trim() !== '' ||
 			contentRef.current?.value.trim() !== ''
 		) {
-			setTodos(prevTodos => [...prevTodos, newTodo]);
+			setTodos((prevTodos) => [...prevTodos, newTodo]);
 
 			createLocalData('todos', [...todos, newTodo]);
+
+			// if user is signed in = put to database
+
+			if (currentUser && currentUser.uid) {
+				addTodoData(
+					currentUser.uid,
+					newTodo.id,
+					newTodo.title,
+					newTodo.description
+				);
+			}
+
+			if (titleRef.current && contentRef.current) {
+				titleRef.current.style.outline = 'none';
+				contentRef.current.style.outline = 'none';
+			}
 		} else {
 			toast.error('Please fill at least one of the fields!');
 
@@ -60,20 +93,50 @@ const Todos: React.FC = () => {
 	};
 
 	useEffect(() => {
+		onAuthStateChanged(auth, (data) => {
+			if (currentUser) return;
+			setCurrentUser(data);
+		});
+	}, [currentUser]);
+
+	useEffect(() => {
+		onAuthStateChanged(auth, (data) => {
+			if (data && data.uid) {
+				getTodoData(data).then((databaseTodo) => {
+					if (databaseTodo) {
+						const typedDatabaseTodo = databaseTodo as TodoType[];
+
+						createLocalData('todos', typedDatabaseTodo);
+						setTodos(typedDatabaseTodo);
+					}
+				});
+			} else {
+				// remove item
+				setTodos([]);
+				deleteLocalData('todos');
+			}
+		});
+	}, [currentUser]);
+
+	useEffect(() => {
 		const data = fetchData('todos') as TodoType[];
 
 		if (data) {
-         setTodos(data);
-      }
-	}, []);
+			setTodos(data);
+		}
+	}, [currentUser]);
+
+	useEffect(() => {
+		console.log(todos);
+	}, [todos]);
 
 	return (
 		<div className='todos-container d-flex flex-column align-items-center'>
 			<div
-				className='newtodo-form w-50 pt-5 d-flex flex-column'
-				style={{ gap: '20px 0' }}
+				className='newtodo-form pt-5 d-flex flex-column'
+				style={{ gap: '20px 0', width: 'clamp(300px, 90%, 500px)' }}
 			>
-				<Form.Group>
+				<Form.Group >
 					<Form.Label>Title</Form.Label>
 					<Form.Control
 						type='title'
@@ -123,7 +186,7 @@ const Todos: React.FC = () => {
 							<Todo
 								key={todo.id}
 								title={todo.title}
-								content={todo.content}
+								description={todo.description}
 								id={todo.id}
 							/>
 						);
