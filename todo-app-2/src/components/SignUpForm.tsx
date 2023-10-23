@@ -10,15 +10,16 @@ import Button from 'react-bootstrap/Button';
 // utilities
 import { signUpUsers } from '../utilities/firebaseUtilities';
 
-const SignUpForm: React.FC = () => {
+const SignUpForm: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
 	const emailRef = useRef<HTMLInputElement>(null);
 	const passwordRef = useRef<HTMLInputElement>(null);
 
 	const handleSignUp = () => {
 		signUpUsers(
 			emailRef.current?.value ?? '',
-			passwordRef.current?.value ?? ''
-		);
+			passwordRef.current?.value ?? '',
+			closeModal
+		)
 
 		if (emailRef.current && passwordRef.current) {
 			emailRef.current.value = '';

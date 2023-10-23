@@ -8,16 +8,28 @@ import BootstrapForm from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { logInUsers } from '../utilities/firebaseUtilities';
 
-const LoginForm: React.FC = () => {
+const LoginForm: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
 	const emailRef = useRef<HTMLInputElement>(null);
 	const passwordRef = useRef<HTMLInputElement>(null);
 
-	const handleLogin = () => {
-		logInUsers(emailRef.current?.value ?? '', passwordRef.current?.value ?? '');
+	const handleLogin = async () => {
+		try {
+			const loggedIn = await logInUsers(
+				emailRef.current?.value ?? '',
+				passwordRef.current?.value ?? ''
+			);
+			
+			if (emailRef.current && passwordRef.current) {
+				emailRef.current.value = '';
+				passwordRef.current.value = '';
+			}
 
-		if (emailRef.current && passwordRef.current) {
-			emailRef.current.value = '';
-			passwordRef.current.value = '';
+			if (loggedIn) {
+				closeModal();
+			}
+
+		} catch (err) {
+			console.error(err);
 		}
 	};
 
