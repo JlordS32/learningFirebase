@@ -6,7 +6,10 @@ import Modal from 'react-bootstrap/Modal';
 // import Button from 'react-bootstrap/Button';
 import BootstrapForm from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import { logInUsers } from '../utilities/firebaseUtilities';
+import { logInUsers, signWithGoogle } from '../utilities/firebaseUtilities';
+
+// google button
+import GoogleButton from 'react-google-button';
 
 const LoginForm: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
 	const emailRef = useRef<HTMLInputElement>(null);
@@ -18,7 +21,7 @@ const LoginForm: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
 				emailRef.current?.value ?? '',
 				passwordRef.current?.value ?? ''
 			);
-			
+
 			if (emailRef.current && passwordRef.current) {
 				emailRef.current.value = '';
 				passwordRef.current.value = '';
@@ -27,7 +30,6 @@ const LoginForm: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
 			if (loggedIn) {
 				closeModal();
 			}
-
 		} catch (err) {
 			console.error(err);
 		}
@@ -60,13 +62,31 @@ const LoginForm: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
 						/>
 					</BootstrapForm.Group>
 				</BootstrapForm>
-				<div className='d-flex justify-content-center pt-4'>
+				<div
+					className='d-flex pt-4 flex-column align-items-center'
+					style={{
+						gap: '1rem 0',
+					}}
+				>
 					<Button
 						variant='dark'
+						style={{
+							width: '240px',
+						}}
 						onClick={handleLogin}
 					>
 						Log in
 					</Button>
+
+					<div>or</div>
+
+					<GoogleButton
+						onClick={() => {
+							signWithGoogle();
+							closeModal();
+						}}
+						type='light'
+					/>
 				</div>
 			</Modal.Body>
 		</>

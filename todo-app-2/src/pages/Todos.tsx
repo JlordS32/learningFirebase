@@ -9,7 +9,11 @@ import { useAutoAnimate } from '@formkit/auto-animate/react';
 // firebase imports
 import { auth } from '../firebaseConfig';
 import { User, onAuthStateChanged } from 'firebase/auth';
-import { addTodoData, getTodoData } from '../utilities/firebaseUtilities';
+import {
+	addTodoData,
+	getTodoData,
+	deleteTodoData,
+} from '../utilities/firebaseUtilities';
 
 // react-bootstrap imports
 import Form from 'react-bootstrap/Form';
@@ -51,7 +55,13 @@ const Todos: React.FC = () => {
 		}
 	};
 
-	const submitTodo = () => {
+	const updateTodoStateAndLocal = (key: string, updatedTodo: TodoType[]) => {
+		// Update state and localStorage
+		createLocalData(key, updatedTodo);
+		setTodos(updatedTodo);
+	};
+
+	const submitTodo = (): void => {
 		const newTodo = {
 			userId: currentUser?.uid ?? '',
 			id: crypto.randomUUID(),
@@ -63,12 +73,10 @@ const Todos: React.FC = () => {
 			titleRef.current?.value.trim() !== '' ||
 			contentRef.current?.value.trim() !== ''
 		) {
+			// add new todo on state and localStorage
 			setTodos((prevTodos) => [...prevTodos, newTodo]);
-
 			createLocalData('todos', [...todos, newTodo]);
-
-			// if user is signed in = put to database
-
+			// if user is signed in => put to database
 			if (currentUser && currentUser.uid) {
 				addTodoData(
 					currentUser.uid,
@@ -92,9 +100,22 @@ const Todos: React.FC = () => {
 		resetInput();
 	};
 
+	const deleteTodo = (id: string): void => {
+		const updatedTodo = todos.filter((todo) => todo.id !== id);
+
+		updateTodoStateAndLocal('todos', updatedTodo);
+
+		// delete todo from the database
+		if (currentUser) {
+			deleteTodoData(currentUser.uid, id);
+		}
+	};
+
+	// useEffect to set currentUser
 	useEffect(() => {
 		onAuthStateChanged(auth, (data) => {
 			if (currentUser) return;
+			
 			setCurrentUser(data);
 		});
 	}, [currentUser]);
@@ -106,8 +127,7 @@ const Todos: React.FC = () => {
 					if (databaseTodo) {
 						const typedDatabaseTodo = databaseTodo as TodoType[];
 
-						createLocalData('todos', typedDatabaseTodo);
-						setTodos(typedDatabaseTodo);
+						updateTodoStateAndLocal('todos', typedDatabaseTodo);
 					}
 				});
 			} else {
@@ -127,7 +147,9 @@ const Todos: React.FC = () => {
 	}, [currentUser]);
 
 	useEffect(() => {
-		console.log(todos);
+		if (currentUser && currentUser.uid) {
+			getTodoData(currentUser);
+		}
 	}, [todos]);
 
 	return (
@@ -136,7 +158,7 @@ const Todos: React.FC = () => {
 				className='newtodo-form pt-5 d-flex flex-column'
 				style={{ gap: '20px 0', width: 'clamp(300px, 90%, 500px)' }}
 			>
-				<Form.Group >
+				<Form.Group>
 					<Form.Label>Title</Form.Label>
 					<Form.Control
 						type='title'
@@ -188,6 +210,7 @@ const Todos: React.FC = () => {
 								title={todo.title}
 								description={todo.description}
 								id={todo.id}
+								deleteTodo={deleteTodo}
 							/>
 						);
 					})}

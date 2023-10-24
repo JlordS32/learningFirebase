@@ -1,16 +1,19 @@
-import { auth, database } from '../firebaseConfig.ts';
+import { auth, database, provider } from '../firebaseConfig.ts';
 import {
 	createUserWithEmailAndPassword,
 	signInWithEmailAndPassword,
 	signOut,
 	User,
+	signInWithPopup,
 } from 'firebase/auth';
 import {
 	collection,
 	addDoc,
-	doc,
+	setDoc,
 	onSnapshot,
 	Timestamp,
+	doc,
+	deleteDoc,
 } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 
@@ -49,6 +52,22 @@ export const signUpUsers = async (
 		if (close) {
 			close();
 		}
+	} catch (error: unknown) {
+		if (error instanceof Error) {
+			console.error(error.message);
+		} else {
+			console.error('An unknown error occurred');
+		}
+	}
+};
+
+export const signWithGoogle = async () => {
+	try {
+		return toast.promise(signInWithPopup(auth, provider), {
+			pending: 'Signing in...',
+			success: 'User signed in successfully 👌',
+			error: 'Failed to sign in user 🤯',
+		});
 	} catch (error: unknown) {
 		if (error instanceof Error) {
 			console.error(error.message);
@@ -100,10 +119,10 @@ export const addTodoData = (
 	title: string = '',
 	description: string = ''
 ) => {
-	const collectionRef = collection(database, 'todos', userId, 'todoOwner');
+	const collectionRef = doc(database, 'todos', userId, 'todoOwner', id);
 
 	return toast.promise(
-		addDoc(collectionRef, {
+		setDoc(collectionRef, {
 			userId: userId,
 			id: id,
 			title: title,
@@ -116,6 +135,19 @@ export const addTodoData = (
 			error: 'An error occurred while a	dding your todo please try again!',
 		}
 	);
+};
+
+export const deleteTodoData = (userId: string, id: string) => {
+	const docToUpdate = doc(database, `todos/${userId}/todoOwner/${id}`);
+
+	console.log(userId, id);
+	console.log(docToUpdate);
+
+	return toast.promise(deleteDoc(docToUpdate), {
+		pending: 'Deleting todo...',
+		success: 'Todo deleted successfully!',
+		error: 'An error occurred while a	dding your todo please try again!',
+	});
 };
 
 export const getTodoData = async (currentUser: User) => {

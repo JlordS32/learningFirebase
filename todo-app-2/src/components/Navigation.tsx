@@ -64,6 +64,7 @@ const Navigation: React.FC = () => {
 				</Navbar.Brand>
 				<Navbar.Toggle aria-controls='basic-navbar-nav' />
 				<Navbar.Collapse className='justify-content-end py-3'>
+					{user && (<small>{user.email}</small>)}
 					<Nav>
 						{user ? (
 							<Button
