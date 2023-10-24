@@ -38,7 +38,22 @@ export const signUpUsers = async (
 			{
 				pending: 'Signing up...',
 				success: 'User signed up successfully 👌',
-				error: 'Failed to sign up user 🤯',
+				error: {
+					render({ data }) {
+						if (data && typeof data === 'object' && 'code' in data) {
+							switch (data.code) {
+								case 'auth/email-already-in-use':
+									return 'Email is already in use. Please use a different email.';
+								case 'auth/invalid-email':
+									return 'Invalid email address';
+								case 'auth/weak-password':
+									return 'Password is too weak mate. Be strong, STAY HARD!';
+								default:
+									return 'An error occurred while signing up. Please try again later.';
+							}
+						}
+					},
+				},
 			}
 		);
 
@@ -86,13 +101,18 @@ export const logInUsers = async (
 		return toast.promise(signInWithEmailAndPassword(auth, email, password), {
 			pending: 'Signing in...',
 			success: 'User signed in successfully!',
-			error: 'Invalid password! Try again uwu~',
+			error: {
+				render({ data }) {
+					// When the promise reject, data will contains the error
+					if (data instanceof Error) {
+						return data?.message;
+					}
+				},
+			},
 		});
 	} catch (error: unknown) {
 		if (error instanceof Error) {
 			console.error(error.message);
-		} else {
-			console.error('An unknown error occurred');
 		}
 	}
 };
