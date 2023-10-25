@@ -8,12 +8,18 @@ import Button from 'react-bootstrap/Button';
 // styles
 import styles from '../styles/styles.module.css';
 
+// asset icons
 import { UserCircleIcon } from '@heroicons/react/24/solid';
 
-const EditAccount: React.FC<{ closeModal: () => void; email: string }> = ({
-	closeModal,
-	email,
-}) => {
+// utlities firebase
+import { submitProfilePicture } from '../utilities/firebaseUtilities';
+import { User } from 'firebase/auth';
+
+const EditAccount: React.FC<{
+	closeModal: () => void;
+	email: string;
+	currentUser: User;
+}> = ({ closeModal, email, currentUser }) => {
 	const [selectedProfilePicture, setSelectedProfilePicture] = useState<File>();
 	const [imageURL, setImageURL] = useState<string>('');
 
@@ -30,6 +36,8 @@ const EditAccount: React.FC<{ closeModal: () => void; email: string }> = ({
 		}
 
 		setSelectedProfilePicture(selectedFile);
+
+		submitProfilePicture(selectedFile as File, currentUser);
 	};
 
 	return (

@@ -16,7 +16,7 @@ import {
 	deleteDoc,
 	updateDoc,
 } from 'firebase/firestore';
-import { ref, uploadBytes } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { toast } from 'react-toastify';
 
 export const signUpUsers = async (
@@ -213,12 +213,29 @@ export const submitProfilePicture = async (
 ) => {
 	const storageRef = ref(
 		storage,
-		`${currentUser.uid}/profilePicture/${submitProfilePicture.name}`
+		`${currentUser.uid}/profilePicture/profilePicture.jpg`
 	);
 
 	return toast.promise(uploadBytes(storageRef, submittedProfilePicture), {
-		pending: 'Uploading todo...',
+		pending: 'Uploading...',
 		success: 'Profile picture uploaded!',
 		error: 'An error occurred while uploading!',
+	});
+};
+
+export const getProfilePictureURL = async (currentUser: User) => {
+	const storageRef = ref(
+		storage,
+		`${currentUser.uid}/profilePicture/profilePicture.jpg`
+	);
+
+	return new Promise(async (resolve, reject) => {
+		try {
+			const url = await getDownloadURL(storageRef);
+			resolve(url);
+		} catch (error: unknown) {
+			console.error('Error fetching data: ', error);
+			reject(error);
+		}
 	});
 };

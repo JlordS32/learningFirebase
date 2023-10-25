@@ -9,11 +9,6 @@ import Form from 'react-bootstrap/Form';
 // hero icons import
 import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid';
 
-interface defaultValue {
-	title: string;
-	description: string;
-}
-
 const Todo: React.FC<{
 	title: string;
 	description: string;

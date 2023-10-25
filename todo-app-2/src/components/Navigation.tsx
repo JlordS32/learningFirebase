@@ -8,7 +8,10 @@ import Nav from 'react-bootstrap/Nav';
 // firebase imports
 import { auth } from '../firebaseConfig';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { signOutUser } from '../utilities/firebaseUtilities';
+import {
+	getProfilePictureURL,
+	signOutUser,
+} from '../utilities/firebaseUtilities';
 
 // components
 import SignUpForm from './SignUpForm';
@@ -29,6 +32,7 @@ const Navigation: React.FC = () => {
 	const [show, setShow] = useState<boolean>(false);
 	const [modalToRender, setModalToRender] = useState<modalType>('signup');
 	const [user, setUser] = useState<User | null>(null);
+	const [profilePictureURL, setProfilePictureURL] = useState<string>('');
 
 	const toggleModal = (): void => {
 		setShow(!show);
@@ -53,8 +57,14 @@ const Navigation: React.FC = () => {
 	}, []);
 
 	useEffect(() => {
-		console.log(modalToRender);
-	}, [modalToRender]);
+		if (user && user.uid) {
+			getProfilePictureURL(user).then((res) => {
+				if (res) {
+					setProfilePictureURL(res as string);
+				}
+			});
+		}
+	});
 
 	return (
 		<>
@@ -85,7 +95,19 @@ const Navigation: React.FC = () => {
 								className={styles['user-profile-icon']}
 								onClick={() => handleModalToRender('accountSettings')}
 							>
-								<UserCircleIcon width={30} />
+								{profilePictureURL && (
+									<div
+										style={{
+											backgroundImage: `url(${profilePictureURL})`,
+											width: '40px',
+											aspectRatio: '1/1',
+											backgroundSize: 'cover',
+											backgroundPosition: 'center',
+											borderRadius: '50%',
+										}}
+									></div>
+								)}
+								{!profilePictureURL && <UserCircleIcon width={30} />}
 							</div>
 						</div>
 					)}
@@ -102,7 +124,20 @@ const Navigation: React.FC = () => {
 								className={styles['user-profile-icon']}
 								onClick={() => handleModalToRender('accountSettings')}
 							>
-								<UserCircleIcon width={30} />
+								{profilePictureURL ? (
+									<div
+										style={{
+											backgroundImage: `url(${profilePictureURL})`,
+											width: '40px',
+											aspectRatio: '1/1',
+											backgroundSize: 'cover',
+											backgroundPosition: 'center',
+											borderRadius: '50%',
+										}}
+									></div>
+								) : (
+									<UserCircleIcon width={30} />
+								)}
 							</div>
 							<small>{user?.email}</small>
 						</div>
@@ -149,6 +184,7 @@ const Navigation: React.FC = () => {
 					<EditAccount
 						closeModal={toggleModal}
 						email={user?.email as string}
+						currentUser={user as User}
 					/>
 				)}
 			</ModalComponent>
