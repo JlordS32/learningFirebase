@@ -1,5 +1,5 @@
 // react imports
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 
 // react-bootstrap ui components
 import Card from 'react-bootstrap/Card';
