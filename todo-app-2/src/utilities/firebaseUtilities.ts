@@ -17,14 +17,6 @@ import {
 } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 
-interface TodoType {
-	userId: string;
-	id: string;
-	title: string;
-	description: string;
-	createdAt: string;
-}
-
 export const signUpUsers = async (
 	email: string,
 	password: string,
@@ -94,8 +86,7 @@ export const signWithGoogle = async () => {
 
 export const logInUsers = async (
 	email: string,
-	password: string,
-	close?: () => void
+	password: string
 ) => {
 	try {
 		return toast.promise(signInWithEmailAndPassword(auth, email, password), {
@@ -169,6 +160,10 @@ export const deleteTodoData = (userId: string, id: string) => {
 		error: 'An error occurred while a	dding your todo please try again!',
 	});
 };
+
+export const updateTodoData = (userId: string, id: string, updatedTitle: string = '', updatedDescription: string = '') => {
+
+}
 
 export const getTodoData = async (currentUser: User) => {
 	const collectionRef = collection(

@@ -1,5 +1,5 @@
 // react imports
-import React, { useEffect, useState } from 'react';
+import React, { useState, useRef } from 'react';
 
 // react-bootstrap ui components
 import Card from 'react-bootstrap/Card';
@@ -15,8 +15,18 @@ const Todo: React.FC<{
 	const [isEditable, setIsEditable] = useState<boolean>(false);
 	const [selectedTodo, setSelectedTodo] = useState<string>('');
 
+	// useRef hooks
+	const titleRef = useRef<HTMLInputElement>(null);
+	const descRef = useRef<HTMLTextAreaElement>(null);
+
 	const onDelete = (): void => {
 		deleteTodo(id);
+	};
+
+	const handleUpdateTodo = (id: string): void => {
+		if (titleRef.current && descRef.current) {
+			console.log(titleRef.current.value, descRef.current.value);
+		}
 	};
 
 	return (
@@ -32,6 +42,8 @@ const Todo: React.FC<{
 							style={{
 								resize: 'none',
 							}}
+							name='title'
+							ref={titleRef}
 						/>
 					) : (
 						<Card.Title>{title}</Card.Title>
@@ -44,6 +56,8 @@ const Todo: React.FC<{
 							style={{
 								resize: 'none',
 							}}
+							name='description'
+							ref={descRef}
 						/>
 					) : (
 						<div>{description}</div>
@@ -55,6 +69,7 @@ const Todo: React.FC<{
 							onClick={() => {
 								setIsEditable(!isEditable);
 								setSelectedTodo(id);
+								handleUpdateTodo(id);
 							}}
 						>
 							Update
