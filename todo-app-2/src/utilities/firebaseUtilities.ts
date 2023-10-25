@@ -1,4 +1,4 @@
-import { auth, database, provider } from '../firebaseConfig.ts';
+import { auth, database, provider, storage } from '../firebaseConfig.ts';
 import {
 	createUserWithEmailAndPassword,
 	signInWithEmailAndPassword,
@@ -16,8 +16,8 @@ import {
 	deleteDoc,
 	updateDoc,
 } from 'firebase/firestore';
+import { ref, uploadBytes } from 'firebase/storage';
 import { toast } from 'react-toastify';
-
 
 export const signUpUsers = async (
 	email: string,
@@ -86,10 +86,7 @@ export const signWithGoogle = async () => {
 	}
 };
 
-export const logInUsers = async (
-	email: string,
-	password: string
-) => {
+export const logInUsers = async (email: string, password: string) => {
 	try {
 		return toast.promise(signInWithEmailAndPassword(auth, email, password), {
 			pending: 'Signing in...',
@@ -207,5 +204,21 @@ export const getTodoData = async (currentUser: User) => {
 				reject(error);
 			}
 		});
+	});
+};
+
+export const submitProfilePicture = async (
+	submittedProfilePicture: File,
+	currentUser: User
+) => {
+	const storageRef = ref(
+		storage,
+		`${currentUser.uid}/profilePicture/${submitProfilePicture.name}`
+	);
+
+	return toast.promise(uploadBytes(storageRef, submittedProfilePicture), {
+		pending: 'Uploading todo...',
+		success: 'Profile picture uploaded!',
+		error: 'An error occurred while uploading!',
 	});
 };

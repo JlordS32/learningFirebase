@@ -1,8 +1,5 @@
 import { useEffect, useState } from 'react';
 
-// components F
-import ModalComponent from './ModalComponent';
-
 // react-bootstrap imports
 import Navbar from 'react-bootstrap/Navbar';
 import Button from 'react-bootstrap/Button';
@@ -16,22 +13,30 @@ import { signOutUser } from '../utilities/firebaseUtilities';
 // components
 import SignUpForm from './SignUpForm';
 import LoginForm from './LoginForm';
+import ModalComponent from './ModalComponent';
+
+// @heroicons imports
+import { UserCircleIcon } from '@heroicons/react/24/solid';
+
+// styles
+import styles from '../styles/styles.module.css';
+import EditAccount from './EditAccount';
 
 // custom types
-type modalType = 'login' | 'signup';
+type modalType = 'login' | 'signup' | 'accountSettings';
 
 const Navigation: React.FC = () => {
 	const [show, setShow] = useState<boolean>(false);
-	const [signInOrLogin, setSignOrLogin] = useState<modalType>('signup');
+	const [modalToRender, setModalToRender] = useState<modalType>('signup');
 	const [user, setUser] = useState<User | null>(null);
 
 	const toggleModal = (): void => {
 		setShow(!show);
 	};
 
-	const handleSignInOrLogin = (modalType: modalType): void => {
+	const handleModalToRender = (modalType: modalType): void => {
 		toggleModal();
-		setSignOrLogin(modalType);
+		setModalToRender(modalType);
 	};
 
 	const handleSignout = (): void => {
@@ -47,11 +52,15 @@ const Navigation: React.FC = () => {
 		});
 	}, []);
 
+	useEffect(() => {
+		console.log(modalToRender);
+	}, [modalToRender]);
+
 	return (
 		<>
 			<Navbar
 				expand='lg'
-				className='px-5 py-1 text-bg-dark'
+				className='px-5 py-lg-1 py-3 text-bg-dark'
 				data-bs-theme='dark'
 			>
 				<Navbar.Brand
@@ -62,9 +71,42 @@ const Navigation: React.FC = () => {
 				>
 					My Logo
 				</Navbar.Brand>
-				<Navbar.Toggle aria-controls='basic-navbar-nav' />
-				<Navbar.Collapse className='justify-content-end py-3'>
-					{user && (<small>{user.email}</small>)}
+
+				<div
+					className='d-flex'
+					style={{ gap: '0 1rem' }}
+				>
+					{user && (
+						<div
+							className='d-flex align-items-center d-lg-none'
+							style={{ gap: '0 1rem' }}
+						>
+							<div
+								className={styles['user-profile-icon']}
+								onClick={() => handleModalToRender('accountSettings')}
+							>
+								<UserCircleIcon width={30} />
+							</div>
+						</div>
+					)}
+					<Navbar.Toggle aria-controls='basic-navbar-nav' />
+				</div>
+
+				<Navbar.Collapse className='py-3 justify-content-end'>
+					{user && (
+						<div
+							className='d-flex align-items-center d-lg-flex d-none'
+							style={{ gap: '0 1rem' }}
+						>
+							<div
+								className={styles['user-profile-icon']}
+								onClick={() => handleModalToRender('accountSettings')}
+							>
+								<UserCircleIcon width={30} />
+							</div>
+							<small>{user?.email}</small>
+						</div>
+					)}
 					<Nav>
 						{user ? (
 							<Button
@@ -77,7 +119,7 @@ const Navigation: React.FC = () => {
 							<Button
 								variant='dark'
 								onClick={() => {
-									handleSignInOrLogin('login');
+									handleModalToRender('login');
 								}}
 							>
 								Log in
@@ -87,7 +129,7 @@ const Navigation: React.FC = () => {
 							<Button
 								variant='dark'
 								onClick={() => {
-									handleSignInOrLogin('signup');
+									handleModalToRender('signup');
 								}}
 							>
 								Create an account
@@ -97,16 +139,17 @@ const Navigation: React.FC = () => {
 				</Navbar.Collapse>
 			</Navbar>
 
-			{/* Log in / Sign up modal*/}
 			<ModalComponent
 				show={show}
 				toggle={toggleModal}
 			>
-				{/* Toggle LoginForm Component or SignupForm component if modalType is 'login' or 'sign up' */}
-				{signInOrLogin === 'login' ? (
-					<LoginForm closeModal={toggleModal} />
-				) : (
-					<SignUpForm closeModal={toggleModal} />
+				{modalToRender === 'login' && <LoginForm closeModal={toggleModal} />}
+				{modalToRender === 'signup' && <SignUpForm closeModal={toggleModal} />}
+				{modalToRender === 'accountSettings' && (
+					<EditAccount
+						closeModal={toggleModal}
+						email={user?.email as string}
+					/>
 				)}
 			</ModalComponent>
 		</>

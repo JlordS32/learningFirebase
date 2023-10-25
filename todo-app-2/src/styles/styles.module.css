@@ -1,0 +1,17 @@
+.user-profile-icon:hover {
+   cursor: pointer;
+}
+
+.edit-profile-icon {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+}
+
+.edit-profile-icon > svg:hover {
+   opacity: 0.6;
+}
+
+.edit-profile-icon:hover {
+   cursor: pointer;
+}

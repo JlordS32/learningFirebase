@@ -13,17 +13,19 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
 	children, // Include the children prop here
 }) => {
 	return (
-		<Modal
-			show={show}
-			onHide={toggle}
-			aria-labelledby='contained-modal-title-vcenter'
-			className='modal-component'
-			centered
-		>
-			{React.cloneElement(children as React.ReactElement<any, string>, {
-				closeModal: toggle
-			})}
-		</Modal>
+		<>
+			{children && (
+				<Modal
+					show={show}
+					onHide={toggle}
+					aria-labelledby='contained-modal-title-vcenter'
+					className='modal-component'
+					centered
+				>
+					{children}
+				</Modal>
+			)}
+		</>
 	);
 };
 

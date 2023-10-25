@@ -23,10 +23,6 @@ const Todo: React.FC<{
 }> = ({ title, description, id, deleteTodo, updateTodo }) => {
 	const [isEditable, setIsEditable] = useState<boolean>(false);
 	const [selectedTodo, setSelectedTodo] = useState<string>('');
-	const [defaultValue, setDefaultValue] = useState<defaultValue>({
-		title: title,
-		description: description,
-	});
 
 	const titleRef = useRef<HTMLInputElement>(null);
 	const descRef = useRef<HTMLTextAreaElement>(null);
@@ -34,13 +30,6 @@ const Todo: React.FC<{
 	const onDelete = (): void => {
 		deleteTodo(id);
 	};
-
-	useEffect(() => {
-		setDefaultValue({
-			title: title,
-			description: description,
-		});
-	});
 
 	const handleUpdateTodo = () => {
 		if (titleRef.current && descRef.current) {
@@ -69,7 +58,7 @@ const Todo: React.FC<{
 							}}
 							name='title'
 							ref={titleRef}
-							defaultValue={defaultValue?.title}
+							defaultValue={title}
 						/>
 					) : (
 						<Card.Title>{title}</Card.Title>
@@ -85,7 +74,7 @@ const Todo: React.FC<{
 								}}
 								name='description'
 								ref={descRef}
-								defaultValue={defaultValue?.description}
+								defaultValue={description}
 							/>
 						</>
 					) : (
@@ -100,14 +89,6 @@ const Todo: React.FC<{
 						}}
 					>
 						<Button
-							variant='success'
-							onClick={handleUpdateTodo}
-						>
-							<span>
-								<CheckIcon width={15} />
-							</span>
-						</Button>
-						<Button
 							variant='danger'
 							onClick={() => {
 								setIsEditable(!isEditable);
@@ -117,6 +98,14 @@ const Todo: React.FC<{
 						>
 							<span>
 								<XMarkIcon width={15} />
+							</span>
+						</Button>
+						<Button
+							variant='primary'
+							onClick={handleUpdateTodo}
+						>
+							<span>
+								<CheckIcon width={15} />
 							</span>
 						</Button>
 					</Card.Footer>
