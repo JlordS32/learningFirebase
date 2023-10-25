@@ -14,8 +14,17 @@ import {
 	Timestamp,
 	doc,
 	deleteDoc,
+	updateDoc,
 } from 'firebase/firestore';
 import { toast } from 'react-toastify';
+
+interface TodoType {
+	userId: string;
+	id: string;
+	title: string;
+	description: string;
+	createdAt: string;
+}
 
 export const signUpUsers = async (
 	email: string,
@@ -148,11 +157,29 @@ export const addTodoData = (
 	);
 };
 
+export const updateTodoData = (
+	userId: string,
+	id: string,
+	title: string,
+	description: string
+) => {
+	const collectionRef = doc(database, 'todos', userId, 'todoOwner', id);
+
+	return toast.promise(
+		updateDoc(collectionRef, {
+			title: title,
+			description: description,
+		}),
+		{
+			pending: 'Updating todo...',
+			success: 'Todo updated successfully!',
+			error: 'An error occurred while updating your todo!',
+		}
+	);
+};
+
 export const deleteTodoData = (userId: string, id: string) => {
 	const docToUpdate = doc(database, `todos/${userId}/todoOwner/${id}`);
-
-	console.log(userId, id);
-	console.log(docToUpdate);
 
 	return toast.promise(deleteDoc(docToUpdate), {
 		pending: 'Deleting todo...',

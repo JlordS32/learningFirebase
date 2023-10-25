@@ -1,40 +1,42 @@
 // react imports
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 
 // react-bootstrap ui components
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 
+// hero icons import
+import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid';
+
+interface defaultValue {
+	title: string;
+	description: string;
+}
+
 const Todo: React.FC<{
 	title: string;
 	description: string;
 	id: string;
 	deleteTodo: (id: string) => void;
-}> = ({ title, description, id, deleteTodo }) => {
+	updateTodo: (id: string, title: string, description: string) => void;
+}> = ({ title, description, id, deleteTodo, updateTodo }) => {
 	const [isEditable, setIsEditable] = useState<boolean>(false);
 	const [selectedTodo, setSelectedTodo] = useState<string>('');
 
-	// useRef hooks
-	const titleRef = useRef<HTMLInputElement>(null);
-	const descRef = useRef<HTMLTextAreaElement>(null);
-
 	const onDelete = (): void => {
 		deleteTodo(id);
-	};
-
-	const handleUpdateTodo = (id: string): void => {
-		if (titleRef.current && descRef.current) {
-			console.log(titleRef.current.value, descRef.current.value);
-		}
 	};
 
 	return (
 		<div
 			className='todo'
 			id={id}
+			style={{
+				minWidth: '350px',
+			}}
 		>
-			<Card style={{ width: '16rem' }}>
+			<Card>
 				<Card.Header>
 					{id === selectedTodo && isEditable ? (
 						<Form.Control
@@ -42,8 +44,6 @@ const Todo: React.FC<{
 							style={{
 								resize: 'none',
 							}}
-							name='title'
-							ref={titleRef}
 						/>
 					) : (
 						<Card.Title>{title}</Card.Title>
@@ -56,8 +56,6 @@ const Todo: React.FC<{
 							style={{
 								resize: 'none',
 							}}
-							name='description'
-							ref={descRef}
 						/>
 					) : (
 						<div>{description}</div>
@@ -69,7 +67,6 @@ const Todo: React.FC<{
 							onClick={() => {
 								setIsEditable(!isEditable);
 								setSelectedTodo(id);
-								handleUpdateTodo(id);
 							}}
 						>
 							Update

@@ -13,6 +13,7 @@ import {
 	addTodoData,
 	getTodoData,
 	deleteTodoData,
+	updateTodoData
 } from '../utilities/firebaseUtilities';
 
 // react-bootstrap imports
@@ -100,6 +101,30 @@ const Todos: React.FC = () => {
 		resetInput();
 	};
 
+	const updateTodo = (
+		id: string,
+		updatedTitle: string,
+		updatedDescription: string
+	): void => {
+		const updatedTodo = todos.map((todo) => {
+			if (todo.id === id) {
+				return {
+					...todo,
+					title: updatedTitle,
+					description: updatedDescription,
+				};
+			}
+
+			return todo;
+		});
+
+		updateTodoStateAndLocal('todos', updatedTodo)
+		
+		if (currentUser) {
+			updateTodoData(currentUser.uid, id, updatedTitle, updatedDescription)
+		}
+	};
+
 	const deleteTodo = (id: string): void => {
 		const updatedTodo = todos.filter((todo) => todo.id !== id);
 
@@ -115,7 +140,7 @@ const Todos: React.FC = () => {
 	useEffect(() => {
 		onAuthStateChanged(auth, (data) => {
 			if (currentUser) return;
-			
+
 			setCurrentUser(data);
 		});
 	}, [currentUser]);
@@ -211,6 +236,7 @@ const Todos: React.FC = () => {
 								description={todo.description}
 								id={todo.id}
 								deleteTodo={deleteTodo}
+								updateTodo={updateTodo}
 							/>
 						);
 					})}
