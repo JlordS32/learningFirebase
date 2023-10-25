@@ -9,14 +9,25 @@ import Form from 'react-bootstrap/Form';
 // hero icons import
 import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid';
 
+interface defaultValue {
+	title: string;
+	description: string;
+}
+
 const Todo: React.FC<{
 	title: string;
 	description: string;
 	id: string;
 	deleteTodo: (id: string) => void;
-}> = ({ title, description, id, deleteTodo }) => {
+	updateTodo: (id: string, title: string, description: string) => void;
+}> = ({ title, description, id, deleteTodo, updateTodo }) => {
 	const [isEditable, setIsEditable] = useState<boolean>(false);
 	const [selectedTodo, setSelectedTodo] = useState<string>('');
+	const [defaultValue, setDefaultValue] = useState<defaultValue>({
+		title: title,
+		description: description,
+	});
+
 	const titleRef = useRef<HTMLInputElement>(null);
 	const descRef = useRef<HTMLTextAreaElement>(null);
 
@@ -25,12 +36,11 @@ const Todo: React.FC<{
 	};
 
 	const handleUpdateTodo = () => {
-		console.log('click');
 		if (titleRef.current && descRef.current) {
-			console.log({
-				title: titleRef.current.value,
-				description: descRef.current.value,
-			});
+			updateTodo(id, titleRef.current?.value, descRef.current?.value);
+
+			setIsEditable(!isEditable);
+			setSelectedTodo(id);
 		}
 	};
 
@@ -38,8 +48,11 @@ const Todo: React.FC<{
 		<div
 			className='todo'
 			id={id}
+			style={{
+				minWidth: '350px',
+			}}
 		>
-			<Card style={{ width: '16rem' }}>
+			<Card>
 				<Card.Header>
 					{id === selectedTodo && isEditable ? (
 						<Form.Control
@@ -49,6 +62,7 @@ const Todo: React.FC<{
 							}}
 							name='title'
 							ref={titleRef}
+							defaultValue={defaultValue?.title}
 						/>
 					) : (
 						<Card.Title>{title}</Card.Title>
@@ -64,30 +78,42 @@ const Todo: React.FC<{
 								}}
 								name='description'
 								ref={descRef}
+								defaultValue={defaultValue?.description}
 							/>
-							<div className='d-flex justify-content-end pt-3' style={{
-								gap: '1rem'
-							}}>
-								<Button variant='success'>
-									<span>
-										<CheckIcon width={15}/>
-									</span>
-								</Button>
-								<Button variant='danger'>
-									<span>
-										<XMarkIcon width={15} onClick={() => {
-									setIsEditable(!isEditable);
-									setSelectedTodo(id);
-								}}F/>
-									</span>
-								</Button>
-							</div>
 						</>
 					) : (
 						<div>{description}</div>
 					)}
 				</Card.Body>
-				{id !== selectedTodo && !isEditable && (
+				{id === selectedTodo && isEditable ? (
+					<Card.Footer
+						className='d-flex justify-content-end'
+						style={{
+							gap: '1rem',
+						}}
+					>
+						<Button
+							variant='success'
+							onClick={handleUpdateTodo}
+						>
+							<span>
+								<CheckIcon width={15} />
+							</span>
+						</Button>
+						<Button
+							variant='danger'
+							onClick={() => {
+								setIsEditable(!isEditable);
+								setSelectedTodo(id);
+								console.log(isEditable, 'click');
+							}}
+						>
+							<span>
+								<XMarkIcon width={15} />
+							</span>
+						</Button>
+					</Card.Footer>
+				) : (
 					<Card.Footer>
 						<div className='d-flex justify-content-evenly'>
 							<Button
