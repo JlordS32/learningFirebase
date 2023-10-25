@@ -18,13 +18,6 @@ import {
 } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 
-interface TodoType {
-	userId: string;
-	id: string;
-	title: string;
-	description: string;
-	createdAt: string;
-}
 
 export const signUpUsers = async (
 	email: string,
@@ -95,8 +88,7 @@ export const signWithGoogle = async () => {
 
 export const logInUsers = async (
 	email: string,
-	password: string,
-	close?: () => void
+	password: string
 ) => {
 	try {
 		return toast.promise(signInWithEmailAndPassword(auth, email, password), {

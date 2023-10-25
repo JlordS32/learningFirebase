@@ -35,6 +35,13 @@ const Todo: React.FC<{
 		deleteTodo(id);
 	};
 
+	useEffect(() => {
+		setDefaultValue({
+			title: title,
+			description: description,
+		});
+	});
+
 	const handleUpdateTodo = () => {
 		if (titleRef.current && descRef.current) {
 			updateTodo(id, titleRef.current?.value, descRef.current?.value);
