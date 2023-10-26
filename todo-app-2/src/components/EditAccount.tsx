@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 // react bootstrap imports
 import Modal from 'react-bootstrap/Modal';
@@ -19,7 +19,8 @@ const EditAccount: React.FC<{
 	closeModal: () => void;
 	email: string;
 	currentUser: User;
-}> = ({ closeModal, email, currentUser }) => {
+	defaultImage: string;
+}> = ({ closeModal, email, currentUser, defaultImage }) => {
 	const [selectedProfilePicture, setSelectedProfilePicture] = useState<File>();
 	const [imageURL, setImageURL] = useState<string>('');
 
@@ -36,9 +37,17 @@ const EditAccount: React.FC<{
 		}
 
 		setSelectedProfilePicture(selectedFile);
-
-		submitProfilePicture(selectedFile as File, currentUser);
 	};
+
+	const handleSubmitProfilePicture = () => {
+		submitProfilePicture(selectedProfilePicture as File, currentUser);
+	};
+
+	useEffect(() => {
+		if (defaultImage) {
+			setImageURL(defaultImage);
+		}
+	}, []);
 
 	return (
 		<>
@@ -59,7 +68,7 @@ const EditAccount: React.FC<{
 							htmlFor='user-profile'
 							className={styles['edit-profile-icon']}
 						>
-							{selectedProfilePicture && imageURL ? (
+							{imageURL ? (
 								<div
 									style={{
 										backgroundImage: `url(${imageURL})`,
@@ -112,7 +121,10 @@ const EditAccount: React.FC<{
 				</Button>
 				<Button
 					variant='primary'
-					onClick={closeModal}
+					onClick={() => {
+						closeModal();
+						handleSubmitProfilePicture();
+					}}
 				>
 					Save Changes
 				</Button>

@@ -185,6 +185,7 @@ const Navigation: React.FC = () => {
 						closeModal={toggleModal}
 						email={user?.email as string}
 						currentUser={user as User}
+						defaultImage={profilePictureURL as string}
 					/>
 				)}
 			</ModalComponent>
